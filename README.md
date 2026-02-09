@@ -80,8 +80,6 @@ The application features a dedicated **Canteen Theme** with:
 - High-quality canteen background images for auth pages.
 - Modern, clean, and responsive UI design using Tailwind CSS.
 
-## 📄 License
-This project is licensed under the **ISC License**.
 
 ---
 *Developed with ❤️ by Saman Shakya*

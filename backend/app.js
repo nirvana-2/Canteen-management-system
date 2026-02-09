@@ -7,39 +7,57 @@ const userRoutes = require('./routes/userRoutes');
 const foodRoutes = require('./routes/foodRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const cartRoutes = require('./routes/cartRoutes');
+const { notFound, errorHandler } = require('./middlewares/errorMiddleware');
 
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config();
+}
 
-dotenv.config();
 
 const app = express();
+// CORS Configuration
+const allowedOrigins = [
+    'https://frontend-cms-ebon.vercel.app',
+    'http://localhost:5173'
+];
 
-//middleware
 app.use(cors({
-    origin: 'http://localhost:5173',
-    methods: ['GET', 'PUT', 'POST', 'DELETE'],
-    credentials: true
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+    optionsSuccessStatus: 200
 }));
+
+// Explicitly handle preflight requests
+app.options('*', cors());
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static files
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
-//test route
+// Test route
 app.get('/', (req, res) => {
     res.send('CMS API is running');
 });
-//routes
+
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/food', foodRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/cart', cartRoutes);
-app.use((err, req, res, next) => {
-    const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-    res.status(statusCode).json({
-        message: err.message,
-        stack: process.env.NODE_ENV === 'production' ? null : err.stack,
-    });
-});
+
+// Error handling
+app.use(notFound);
+app.use(errorHandler);
+
 module.exports = app;

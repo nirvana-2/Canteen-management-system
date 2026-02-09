@@ -1,50 +1,48 @@
+const connectDB = require('../config/db');
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
-// to generate token
+
 const generateToken = (id) => {
+    if (!process.env.JWT_SECRET) {
+        throw new Error("JWT_SECRET is not defined");
+    }
+
     return jwt.sign({ id }, process.env.JWT_SECRET, {
         expiresIn: '30d'
-    })
-}
+    });
+};
 
 const registerUser = async (req, res) => {
-    const { name, email, password, phone, role } = req.body;
-    const userExists = await User.findOne({ $or: [{ email }, { phone }] });
-    if (userExists) {
-        res.status(400);
-        const message = userExists.email === email
-            ? 'Email already registered'
-            : 'Phone number already registered';
-        throw new Error(message);
-    }
-    //check for empty spaces
-    if (!name || !email || !password || !phone) {
-        res.status(400).json({ message: 'Please fill all fields' })
-    }
-    //check for valid email
-    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    if (!emailRegex.test(email)) {
-        res.status(400).json({ message: 'Please enter a valid email' })
-    }
-    //check for valid phone number
-    const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(phone)) {
-        res.status(400).json({ message: "please enter a valid phone number" })
-    }
-    //check for valid password
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!passwordRegex.test(password)) {
-        res.status(400).json({ message: "Please enter a valid password" })
-    }
-    //create user
-    const user = await User.create({
-        name,
-        email,
-        password,
-        phone,
-        role: role || 'student',
-    })
-    if (user) {
+    try {
+        await connectDB();
+
+        const { name, email, password, phone, role } = req.body;
+
+        if (!name || !email || !password || !phone) {
+            return res.status(400).json({ message: 'Please fill all fields' });
+        }
+
+        const userExists = await User.findOne({
+            $or: [{ email }, { phone }]
+        });
+
+        if (userExists) {
+            return res.status(400).json({
+                message:
+                    userExists.email === email
+                        ? 'Email already registered'
+                        : 'Phone number already registered'
+            });
+        }
+
+        const user = await User.create({
+            name,
+            email,
+            password,
+            phone,
+            role: role || 'student'
+        });
+
         res.status(201).json({
             _id: user._id,
             name: user.name,
@@ -52,30 +50,43 @@ const registerUser = async (req, res) => {
             phone: user.phone,
             role: user.role,
             token: generateToken(user._id)
-        })
-    }
-}
-//for login user
-const loginUser = async (req, res) => {
-    const { email, password } = req.body;
-    //to validate input
-    if (!email || !password) {
-        res.status(400).json({ message: 'Please fill all fields' })
-    }
-    const user = await User.findOne({ email });
-    //check if user exists and passwor is correct
-    if (user && (await user.matchPassword(password))) {
-        res.status(200).json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            phone: user.phone,
-            role: user.role,
-            token: generateToken(user._id)
         });
+
+    } catch (error) {
+        console.error("Register error:", error.message);
+        res.status(500).json({ message: error.message });
     }
-    else {
-        res.status(401).json({ message: 'Invalid email or password' })
+};
+
+const loginUser = async (req, res) => {
+    try {
+        await connectDB();
+
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Please fill all fields' });
+        }
+
+        const user = await User.findOne({ email });
+
+        if (user && (await user.matchPassword(password))) {
+            res.status(200).json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                role: user.role,
+                token: generateToken(user._id)
+            });
+        } else {
+            res.status(401).json({ message: 'Invalid email or password' });
+        }
+
+    } catch (error) {
+        console.error("Login error:", error.message);
+        res.status(500).json({ message: error.message });
     }
-}
-module.exports = { registerUser, loginUser };
+};
+
+module.exports = { generateToken, registerUser, loginUser };

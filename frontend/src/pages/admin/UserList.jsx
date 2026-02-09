@@ -75,8 +75,9 @@ const UserList = () => {
     try {
       await api.delete(`/users/${id}`);
       fetchUsers();
-    } catch {
-      alert('Failed to delete user');
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to delete user';
+      alert(message);
     }
   };
 

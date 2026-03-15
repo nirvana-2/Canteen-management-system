@@ -37,7 +37,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('/(.*)', cors(corsOptions)); // Explicitly handle preflight requests
 
 // Middleware
 app.use(express.json());

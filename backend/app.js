@@ -1,7 +1,8 @@
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
+require('dotenv').config();
 const path = require('path');
+
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const foodRoutes = require('./routes/foodRoutes');
@@ -9,28 +10,35 @@ const orderRoutes = require('./routes/orderRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const { notFound, errorHandler } = require('./middlewares/errorMiddleware');
 
-if (process.env.NODE_ENV !== 'production') {
-    require('dotenv').config();
-}
-
-
 const app = express();
+
 // CORS Configuration
 const allowedOrigins = [
-    'https://frontend-cms-ebon.vercel.app',
-    'http://localhost:5173'
+      "http://localhost:5173",
+       "http://localhost:3000", 
+       /^https:\/\/frontend-cms-ebon.*\.vercel\.app$/,
+        /^https:\/\/frontend-2hrlgbbpa.*\.vercel\.app$/
 ];
 
-app.use(cors({
-    origin: allowedOrigins,
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
-    optionsSuccessStatus: 200
-}));
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // allow requests with no origin
+    if (allowedOrigins.some(o =>
+      typeof o === "string" ? o === origin : o.test(origin)
+    )) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"), false);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  optionsSuccessStatus: 200
+};
 
-// Explicitly handle preflight requests
-app.options('*', cors());
+app.use(cors(corsOptions));
+app.options('/(.*)', cors(corsOptions)); // Explicitly handle preflight requests
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -40,7 +48,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // Test route
 app.get('/', (req, res) => {
-    res.send('CMS API is running');
+  res.send('CMS API is running');
 });
 
 // Routes

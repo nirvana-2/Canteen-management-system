@@ -2,6 +2,18 @@
 
 **Hamro Canteen** is a modern, full-stack web application designed to streamline canteen operations for students, staff, and administrators. It provides a seamless dining experience with real-time stats, fast ordering, and efficient order management.
 
+## 🌐 Live Demo
+
+👉 **[https://canteen-management-system-rho.vercel.app](https://canteen-management-system-rho.vercel.app)**
+
+| Role    | Email                  | Password    |
+|---------|------------------------|-------------|
+| Admin   | admin@canteen.com      | admin123    |
+| Staff   | staff@canteen.com      | staff123    |
+| Student | saman@canteen.com      | student123  |
+
+---
+
 ## 🚀 Features
 
 ### For Students
@@ -21,6 +33,8 @@
 - **User Management**: Manage user accounts and roles.
 - **Order Oversight**: Access to all orders across the system.
 
+---
+
 ## 🛠️ Tech Stack
 
 ### Frontend
@@ -38,6 +52,13 @@
 - **Bcrypt.js**: Industry-standard password hashing.
 - **Multer**: Handling image uploads for food items.
 
+### Deployment
+- **Vercel**: Frontend hosting
+- **Render**: Backend hosting
+- **MongoDB Atlas**: Cloud database
+
+---
+
 ## 📦 Installation & Setup
 
 ### Prerequisites
@@ -46,8 +67,8 @@
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/canteen-management-system.git
-cd canteen-management-system
+git clone https://github.com/nirvana-2/Canteen-management-system.git
+cd Canteen-management-system
 ```
 
 ### 2. Backend Setup
@@ -58,12 +79,13 @@ npm install
 Create a `.env` file in the `backend` directory:
 ```env
 PORT=3000
-MONGODB_URI=your_mongodb_connection_string
+MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_secret_key
+BASE_URL=http://localhost:3000
 ```
 Start the backend server:
 ```bash
-npm run dev
+node server.js
 ```
 
 ### 3. Frontend Setup
@@ -72,7 +94,15 @@ cd ../frontend
 npm install
 npm run dev
 ```
+
+Create a `.env` file in the `frontend` directory:
+```env
+VITE_API_URL=http://localhost:3000
+```
+
 The application will be available at `http://localhost:5173`.
+
+---
 
 ## 🎨 Theming
 The application features a dedicated **Canteen Theme** with:
@@ -80,6 +110,6 @@ The application features a dedicated **Canteen Theme** with:
 - High-quality canteen background images for auth pages.
 - Modern, clean, and responsive UI design using Tailwind CSS.
 
-
 ---
+
 *Developed with ❤️ by Saman Shakya*

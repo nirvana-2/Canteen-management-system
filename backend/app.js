@@ -14,15 +14,15 @@ const app = express();
 
 // CORS Configuration
 const allowedOrigins = [
-      "http://localhost:5173",
-       "http://localhost:3000", 
-       /^https:\/\/frontend-cms-ebon.*\.vercel\.app$/,
-        /^https:\/\/frontend-2hrlgbbpa.*\.vercel\.app$/
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://canteen-management-system-rho.vercel.app",
+  /\.vercel\.app$/
 ];
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true); // allow requests with no origin
+    if (!origin) return callback(null, true);
     if (allowedOrigins.some(o =>
       typeof o === "string" ? o === origin : o.test(origin)
     )) {

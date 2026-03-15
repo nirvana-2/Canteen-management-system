@@ -5,6 +5,7 @@ import Loader from '../../components/common/Loader';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Modal from '../../components/common/Modal';
+import { getImageSrc } from '../../utils/imageUtils';
 
 const FoodList = () => {
   const [foods, setFoods] = useState([]);
@@ -52,7 +53,7 @@ const FoodList = () => {
         available: food.available,
         image: null
       });
-      setImagePreview(food.image ? `http://localhost:3000${food.image}` : null);
+      setImagePreview(getImageSrc(food.image));
     } else {
       setEditingFood(null);
       setFormData({
@@ -133,7 +134,6 @@ const FoodList = () => {
     try {
       const data = new FormData();
       data.append('available', !food.available);
-      
       await api.put(`/food/${food._id}`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
@@ -191,67 +191,60 @@ const FoodList = () => {
               {foods
                 .filter(food => showOutOfStock || food.available)
                 .map((food) => (
-                <tr key={food._id} className="hover:bg-gray-50/50 transition-colors group">
-                  <td className="px-6 py-4">
-                    <img 
-                      src={food.image ? `http://localhost:3000${food.image}` : 'https://via.placeholder.com/60'} 
-                      alt={food.name}
-                      className="w-12 h-12 rounded-lg object-cover border border-gray-100"
-                      onError={(e) => { e.target.src = 'https://via.placeholder.com/60' }}
-                    />
-                  </td>
-                  <td className="px-6 py-4">
-                    <p className="font-bold text-gray-800">{food.name}</p>
-                    <p className="text-xs text-gray-400 capitalize">{food.category}</p>
-                  </td>
-                  <td className="px-6 py-4 font-bold text-primary">Rs. {food.price}</td>
-                  <td className="px-6 py-4">
-                    <button
-                      onClick={() => handleToggleAvailability(food)}
-                      className={`flex items-center text-xs font-bold px-2 py-1 rounded-lg w-fit transition-all ${
-                        food.available 
-                          ? 'text-green-600 bg-green-50 hover:bg-green-100' 
+                  <tr key={food._id} className="hover:bg-gray-50/50 transition-colors group">
+                    <td className="px-6 py-4">
+                      <img
+                        src={getImageSrc(food.image)}
+                        alt={food.name}
+                        className="w-12 h-12 rounded-lg object-cover border border-gray-100"
+                        onError={(e) => { e.target.src = 'https://via.placeholder.com/60' }}
+                      />
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="font-bold text-gray-800">{food.name}</p>
+                      <p className="text-xs text-gray-400 capitalize">{food.category}</p>
+                    </td>
+                    <td className="px-6 py-4 font-bold text-primary">Rs. {food.price}</td>
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() => handleToggleAvailability(food)}
+                        className={`flex items-center text-xs font-bold px-2 py-1 rounded-lg w-fit transition-all ${food.available
+                          ? 'text-green-600 bg-green-50 hover:bg-green-100'
                           : 'text-red-500 bg-red-50 hover:bg-red-100'
-                      }`}
-                      title={food.available ? 'Click to mark as Out of Stock' : 'Click to mark as Available'}
-                    >
-                      {food.available ? (
-                        <>
-                          <Check size={12} className="mr-1" /> Available
-                        </>
-                      ) : (
-                        <>
-                          <X size={12} className="mr-1" /> Out of Stock
-                        </>
-                      )}
-                    </button>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex justify-end space-x-2">
-                      <button 
-                        onClick={() => handleOpenModal(food)}
-                        className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
+                          }`}
                       >
-                        <Edit2 size={18} />
+                        {food.available ? (
+                          <><Check size={12} className="mr-1" /> Available</>
+                        ) : (
+                          <><X size={12} className="mr-1" /> Out of Stock</>
+                        )}
                       </button>
-                      <button 
-                        onClick={() => handleDelete(food._id)}
-                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end space-x-2">
+                        <button
+                          onClick={() => handleOpenModal(food)}
+                          className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
+                        >
+                          <Edit2 size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(food._id)}
+                          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Add/Edit Modal */}
-      <Modal 
-        isOpen={modalOpen} 
+      <Modal
+        isOpen={modalOpen}
         onClose={() => !submitting && setModalOpen(false)}
         title={editingFood ? 'Edit Food Item' : 'Add New Food Item'}
       >
@@ -329,7 +322,7 @@ const FoodList = () => {
                   className="hidden"
                   id="food-image-input"
                 />
-                <label 
+                <label
                   htmlFor="food-image-input"
                   className="cursor-pointer inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-bold rounded-xl hover:bg-gray-200 transition-all"
                 >

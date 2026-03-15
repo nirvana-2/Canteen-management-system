@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Plus, ShoppingCart, AlertCircle } from 'lucide-react';
 import Button from '../common/Button';
 import useCart from '../../hooks/useCart';
+import { getImageSrc } from '../../utils/imageUtils';
 
 const FoodItemCard = ({ food, onClick }) => {
   const { addToCart } = useCart();
@@ -13,7 +14,7 @@ const FoodItemCard = ({ food, onClick }) => {
     setAdding(true);
     const result = await addToCart(food._id, 1);
     setAdding(false);
-    
+
     if (result?.success) {
       setAdded(true);
       setTimeout(() => setAdded(false), 2000);
@@ -21,13 +22,13 @@ const FoodItemCard = ({ food, onClick }) => {
   };
 
   return (
-    <div 
+    <div
       onClick={onClick}
       className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group cursor-pointer"
     >
       <div className="relative h-48 overflow-hidden">
         <img
-          src={food.image ? `http://localhost:3000${food.image}` : 'https://via.placeholder.com/400x300?text=No+Image'}
+          src={getImageSrc(food.image)}
           alt={food.name}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           onError={(e) => { e.target.src = 'https://via.placeholder.com/400x300?text=No+Image' }}
@@ -55,7 +56,7 @@ const FoodItemCard = ({ food, onClick }) => {
             {food.category}
           </span>
         </div>
-        
+
         <p className="text-gray-500 text-sm line-clamp-2 mb-4 h-10">
           {food.description}
         </p>

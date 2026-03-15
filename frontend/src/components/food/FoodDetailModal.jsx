@@ -3,6 +3,7 @@ import { Plus, ShoppingCart, AlertCircle, Clock, Utensils } from 'lucide-react';
 import Modal from '../common/Modal';
 import Button from '../common/Button';
 import useCart from '../../hooks/useCart';
+import { getImageSrc } from '../../utils/imageUtils';
 
 const FoodDetailModal = ({ isOpen, onClose, food }) => {
   const { addToCart } = useCart();
@@ -15,7 +16,7 @@ const FoodDetailModal = ({ isOpen, onClose, food }) => {
     setAdding(true);
     const result = await addToCart(food._id, 1);
     setAdding(false);
-    
+
     if (result?.success) {
       setAdded(true);
       setTimeout(() => setAdded(false), 2000);
@@ -28,7 +29,7 @@ const FoodDetailModal = ({ isOpen, onClose, food }) => {
         {/* Image Section */}
         <div className="relative h-64 rounded-2xl overflow-hidden shadow-inner bg-gray-100">
           <img
-            src={food.image ? `http://localhost:3000${food.image}` : 'https://via.placeholder.com/600x400?text=No+Image'}
+            src={getImageSrc(food.image)}
             alt={food.name}
             className="w-full h-full object-cover"
             onError={(e) => { e.target.src = 'https://via.placeholder.com/600x400?text=No+Image' }}
@@ -91,9 +92,8 @@ const FoodDetailModal = ({ isOpen, onClose, food }) => {
             onClick={handleAddToCart}
             disabled={!food.available || added}
             loading={adding}
-            className={`w-full py-4 text-lg font-bold shadow-lg shadow-primary/20 transition-all active:scale-95 ${
-              added ? 'bg-green-500 hover:bg-green-600 border-green-500 shadow-green-200' : ''
-            }`}
+            className={`w-full py-4 text-lg font-bold shadow-lg shadow-primary/20 transition-all active:scale-95 ${added ? 'bg-green-500 hover:bg-green-600 border-green-500 shadow-green-200' : ''
+              }`}
           >
             {!food.available ? (
               'Currently Unavailable'

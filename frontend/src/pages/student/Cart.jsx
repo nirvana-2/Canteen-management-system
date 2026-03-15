@@ -6,6 +6,7 @@ import useCart from '../../hooks/useCart';
 import api from '../../services/api';
 import Button from '../../components/common/Button';
 import Loader from '../../components/common/Loader';
+import { getImageSrc } from '../../utils/imageUtils';
 
 const Cart = () => {
   const { cart, loading, updateQuantity, removeFromCart, clearCart } = useCart();
@@ -14,7 +15,7 @@ const Cart = () => {
 
   const handleCheckout = async () => {
     if (cart.items.length === 0) return;
-    
+
     setCheckoutLoading(true);
     try {
       const response = await api.post('/orders');
@@ -55,8 +56,8 @@ const Cart = () => {
           <div className="lg:col-span-2 space-y-4">
             {cart.items.map((item) => (
               <div key={item.food} className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center group transition-all hover:shadow-md">
-                <img 
-                  src={item.image ? `http://localhost:3000${item.image}` : 'https://via.placeholder.com/100?text=No+Image'} 
+                <img
+                  src={getImageSrc(item.image)}
                   alt={item.name}
                   className="w-20 h-20 rounded-xl object-cover mr-4"
                   onError={(e) => { e.target.src = 'https://via.placeholder.com/100?text=No+Image' }}
@@ -65,16 +66,16 @@ const Cart = () => {
                   <h3 className="font-bold text-gray-800 text-lg">{item.name}</h3>
                   <p className="text-primary font-bold">Rs. {item.price}</p>
                 </div>
-                
+
                 <div className="flex items-center space-x-3 mr-6">
-                  <button 
+                  <button
                     onClick={() => updateQuantity(item.food, (item.qty || item.quantity) - 1)}
                     className="p-1 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200"
                   >
                     <Minus size={18} />
                   </button>
                   <span className="font-bold w-6 text-center">{item.qty || item.quantity}</span>
-                  <button 
+                  <button
                     onClick={() => updateQuantity(item.food, (item.qty || item.quantity) + 1)}
                     className="p-1 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200"
                   >
@@ -87,7 +88,7 @@ const Cart = () => {
                   <p className="font-bold text-gray-800">Rs. {item.price * (item.qty || item.quantity)}</p>
                 </div>
 
-                <button 
+                <button
                   onClick={() => removeFromCart(item.food)}
                   className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                 >
@@ -101,7 +102,7 @@ const Cart = () => {
           <div className="lg:col-span-1">
             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xl sticky top-24">
               <h2 className="text-xl font-bold text-gray-800 mb-6">Order Summary</h2>
-              
+
               <div className="space-y-4 mb-8">
                 <div className="flex justify-between text-gray-500">
                   <span>Subtotal</span>
@@ -124,7 +125,7 @@ const Cart = () => {
               >
                 Place Order <ArrowRight size={20} className="ml-2" />
               </Button>
-              
+
               <p className="mt-4 text-xs text-center text-gray-400">
                 By clicking "Place Order", you agree to our terms of service and order policies.
               </p>
